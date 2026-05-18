@@ -1,0 +1,27 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+
+# Vite
+.vite/
+
+# TypeScript
+*.tsbuildinfo
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Assets (PDF/DOCX are large — keep only the MD)
+assets/*.pdf
+assets/*.docx
