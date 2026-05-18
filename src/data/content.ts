@@ -1,7 +1,7 @@
 export const content = {
   personal: {
     name: 'Lorena Santana',
-    fullName: 'Lorena Cynthya Lopes de Santana',
+    fullName: 'Lorena C. L. de Santana',
     title: 'Child and Youth Care Practitioner',
     subtitle: 'Psychologist • Fanshawe College CYC Student • London, Ontario',
     email: 'lorenacynthya@gmail.com',

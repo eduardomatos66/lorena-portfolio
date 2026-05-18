@@ -69,13 +69,17 @@ function Hero() {
             </div>
           </div>
           <div className="hero-visual">
-            <div className="hero-blob">
-              <span className="hero-blob-emoji">🌿</span>
-              <div className="hero-float-card">
+            <div className="hero-photo-frame">
+              <img
+                src="/photos/lorena-hero.jpg"
+                alt="Lorena Santana in Victoria Park, London ON"
+                className="hero-photo"
+              />
+              <div className="hero-float-card" style={{ bottom: '32px', left: '-28px' }}>
                 <span className="hero-float-icon">💚</span>
                 <span>Care with empathy</span>
               </div>
-              <div className="hero-float-card">
+              <div className="hero-float-card" style={{ top: '36px', right: '-20px' }}>
                 <span className="hero-float-icon">⭐</span>
                 <span>12+ years of experience</span>
               </div>
@@ -114,15 +118,20 @@ function About() {
       <div className="container">
         <div className="about-inner">
           <div className="about-visual">
-            <div className="about-card">
-              <p className="about-quote">
-                "My goal is to support children, empower them in their strengths, and build the
-                conditions to transform adversities into growth potential."
-              </p>
-              <div className="about-badge">
+            <div className="about-photo-wrap">
+              <img
+                src="/photos/lorena-about.jpg"
+                alt="Lorena Santana sitting by flowers in London ON"
+                className="about-photo"
+              />
+              <div className="about-photo-badge">
                 <span className="badge badge-green">🎓 Psychologist</span>
                 <span className="badge badge-terra">🏫 CYC Practitioner</span>
                 <span className="badge badge-green">🇧🇷→🇨🇦 Recife → London</span>
+              </div>
+              <div className="about-photo-quote">
+                "My goal is to support children, empower them in their strengths, and build the
+                conditions to transform adversities into growth potential."
               </div>
             </div>
           </div>
