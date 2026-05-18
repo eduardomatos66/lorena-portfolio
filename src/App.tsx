@@ -1,9 +1,18 @@
-import { useState, useEffect } from 'react';
-import { content } from './data/content';
+import { useState, useEffect, createContext, useContext } from 'react';
+import { content as defaultContent } from './data/content';
+import { fetchContent, type ContentType } from './services/sheetsService';
 import './index.css';
 
-/* ── NAVBAR ── */
+// ── Content Context ──────────────────────────────────────────────────────────
+// All components read portfolio data from this context instead of a static
+// import, so the entire tree re-renders automatically when Sheets data arrives.
+
+const ContentContext = createContext<ContentType>(defaultContent);
+const useContent = () => useContext(ContentContext);
+
+// ── NAVBAR ───────────────────────────────────────────────────────────────────
 function Navbar() {
+  const content = useContent();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -48,7 +57,7 @@ function Navbar() {
   );
 }
 
-/* ── HERO ── */
+// ── HERO ─────────────────────────────────────────────────────────────────────
 function Hero() {
   return (
     <section className="hero" id="home">
@@ -91,8 +100,9 @@ function Hero() {
   );
 }
 
-/* ── PILLARS ── */
+// ── PILLARS ───────────────────────────────────────────────────────────────────
 function Pillars() {
+  const content = useContent();
   return (
     <section className="pillars">
       <div className="container">
@@ -110,8 +120,9 @@ function Pillars() {
   );
 }
 
-/* ── ABOUT ── */
+// ── ABOUT ─────────────────────────────────────────────────────────────────────
 function About() {
+  const content = useContent();
   const { highlights } = content;
   return (
     <section className="about" id="about">
@@ -153,8 +164,9 @@ function About() {
   );
 }
 
-/* ── SERVICES ── */
+// ── SERVICES ──────────────────────────────────────────────────────────────────
 function Services() {
+  const content = useContent();
   return (
     <section className="services" id="services">
       <div className="container">
@@ -179,8 +191,9 @@ function Services() {
   );
 }
 
-/* ── APPROACH ── */
+// ── APPROACH ──────────────────────────────────────────────────────────────────
 function Approach() {
+  const content = useContent();
   const { approach } = content;
   return (
     <section className="approach" id="approach">
@@ -214,8 +227,9 @@ function Approach() {
   );
 }
 
-/* ── EXPERIENCE ── */
+// ── EXPERIENCE ────────────────────────────────────────────────────────────────
 function Experience() {
+  const content = useContent();
   const icons = ['💼', '🏫', '🏫', '🧠'];
   return (
     <section className="experience" id="experience">
@@ -244,8 +258,9 @@ function Experience() {
   );
 }
 
-/* ── EDUCATION & CERTIFICATIONS ── */
+// ── EDUCATION & CERTIFICATIONS ────────────────────────────────────────────────
 function EduCerts() {
+  const content = useContent();
   return (
     <section className="edu-certs" id="education">
       <div className="container">
@@ -278,8 +293,9 @@ function EduCerts() {
   );
 }
 
-/* ── FOR FAMILIES ── */
+// ── FOR FAMILIES ──────────────────────────────────────────────────────────────
 function ForFamilies() {
+  const content = useContent();
   const { forFamilies } = content;
   return (
     <section className="for-families" id="families">
@@ -303,8 +319,9 @@ function ForFamilies() {
   );
 }
 
-/* ── REFERENCE ── */
+// ── REFERENCE ─────────────────────────────────────────────────────────────────
 function Reference() {
+  const content = useContent();
   const { reference } = content;
   return (
     <section className="reference-section">
@@ -319,8 +336,9 @@ function Reference() {
   );
 }
 
-/* ── CONTACT ── */
+// ── CONTACT ───────────────────────────────────────────────────────────────────
 function Contact() {
+  const content = useContent();
   const { personal } = content;
   return (
     <section className="contact" id="contact">
@@ -382,7 +400,7 @@ function Contact() {
   );
 }
 
-/* ── FOOTER ── */
+// ── FOOTER ────────────────────────────────────────────────────────────────────
 function Footer() {
   return (
     <footer className="footer">
@@ -397,10 +415,50 @@ function Footer() {
   );
 }
 
-/* ── APP ── */
-export default function App() {
+// ── LOADING SCREEN ────────────────────────────────────────────────────────────
+function LoadingScreen() {
   return (
-    <>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '20px',
+      background: 'var(--cream)',
+      color: 'var(--green-dark)',
+    }}>
+      <div style={{
+        width: '52px',
+        height: '52px',
+        border: '4px solid var(--green-light)',
+        borderTopColor: 'var(--green)',
+        borderRadius: '50%',
+        animation: 'spin 0.9s linear infinite',
+      }} />
+      <p style={{ fontFamily: 'var(--font-serif)', fontSize: '1.1rem', opacity: 0.7 }}>
+        Loading portfolio…
+      </p>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
+// ── APP ───────────────────────────────────────────────────────────────────────
+export default function App() {
+  const [content, setContent] = useState<ContentType>(defaultContent);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchContent()
+      .then(data => setContent(data))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <LoadingScreen />;
+
+  return (
+    <ContentContext.Provider value={content}>
       <Navbar />
       <main>
         <Hero />
@@ -415,6 +473,6 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
-    </>
+    </ContentContext.Provider>
   );
 }

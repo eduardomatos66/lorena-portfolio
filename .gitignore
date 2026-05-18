@@ -25,3 +25,8 @@ Thumbs.db
 # Assets (PDF/DOCX are large — keep only the MD)
 assets/*.pdf
 assets/*.docx
+
+# Environment variables
+.env
+.env.local
+.env.*.local
