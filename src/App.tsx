@@ -1,7 +1,14 @@
 import { useState, useEffect, createContext, useContext } from 'react';
+import emailjs from '@emailjs/browser';
 import { content as defaultContent } from './data/content';
 import { fetchContent, type ContentType } from './services/sheetsService';
 import './index.css';
+
+// ── EmailJS config ────────────────────────────────────────────────────────────
+// Credentials are loaded from .env (VITE_ prefix required by Vite).
+const EMAILJS_SERVICE_ID  = import.meta.env.VITE_EMAILJS_SERVICE_ID  as string;
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID as string;
+const EMAILJS_PUBLIC_KEY  = import.meta.env.VITE_EMAILJS_PUBLIC_KEY  as string;
 
 // ── Content Context ──────────────────────────────────────────────────────────
 // All components read portfolio data from this context instead of a static
@@ -337,9 +344,48 @@ function Reference() {
 }
 
 // ── CONTACT ───────────────────────────────────────────────────────────────────
+type FormStatus = 'idle' | 'sending' | 'success' | 'error';
+
 function Contact() {
   const content = useContent();
   const { personal } = content;
+  const [fields, setFields] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState<FormStatus>('idle');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFields(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fields.name.trim() || !fields.email.trim() || !fields.message.trim()) return;
+
+    setStatus('sending');
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          name:    fields.name,
+          email:   fields.email,
+          message: fields.message,
+          time:    new Date().toLocaleString('en-CA', {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+          }),
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY },
+      );
+      setStatus('success');
+      setFields({ name: '', email: '', message: '' });
+    } catch (err) {
+      console.error('[EmailJS error]', err);
+      setStatus('error');
+    }
+  };
+
+  const isSending = status === 'sending';
+
   return (
     <section className="contact" id="contact">
       <div className="container">
@@ -376,23 +422,72 @@ function Contact() {
               </div>
             </div>
           </div>
+
           <div className="contact-form">
             <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', marginBottom: '24px' }}>Send a message</h3>
-            <div className="form-group">
-              <label className="form-label" htmlFor="name">Your name</label>
-              <input id="name" className="form-input" type="text" placeholder="What should I call you?" />
-            </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="email">Email</label>
-              <input id="email" className="form-input" type="email" placeholder="your@email.com" />
-            </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="message">Message</label>
-              <textarea id="message" className="form-textarea" placeholder="Tell me a little about what you need..." />
-            </div>
-            <button className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '14px' }}>
-              ✉ Send Message
-            </button>
+
+            {status === 'success' && (
+              <div className="form-feedback form-feedback--success">
+                ✅ Message sent! I'll get back to you soon.
+              </div>
+            )}
+            {status === 'error' && (
+              <div className="form-feedback form-feedback--error">
+                ❌ Something went wrong. Please try again or email me directly.
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="form-group">
+                <label className="form-label" htmlFor="contact-name">Your name</label>
+                <input
+                  id="contact-name"
+                  name="name"
+                  className="form-input"
+                  type="text"
+                  placeholder="What should I call you?"
+                  value={fields.name}
+                  onChange={handleChange}
+                  required
+                  disabled={isSending}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="contact-email">Email</label>
+                <input
+                  id="contact-email"
+                  name="email"
+                  className="form-input"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={fields.email}
+                  onChange={handleChange}
+                  required
+                  disabled={isSending}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="contact-message">Message</label>
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  className="form-textarea"
+                  placeholder="Tell me a little about what you need..."
+                  value={fields.message}
+                  onChange={handleChange}
+                  required
+                  disabled={isSending}
+                />
+              </div>
+              <button
+                type="submit"
+                className="btn-primary"
+                style={{ width: '100%', justifyContent: 'center', padding: '14px' }}
+                disabled={isSending || !fields.name || !fields.email || !fields.message}
+              >
+                {isSending ? '⏳ Sending…' : '✉ Send Message'}
+              </button>
+            </form>
           </div>
         </div>
       </div>

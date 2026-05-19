@@ -333,6 +333,20 @@ a { color: inherit; text-decoration: none; }
 }
 .form-input:focus, .form-textarea:focus { border-color: var(--green); background: white; }
 .form-textarea { resize: vertical; min-height: 120px; }
+.form-input:disabled, .form-textarea:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.form-feedback {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px; border-radius: 10px;
+  font-size: 0.9rem; font-weight: 500; margin-bottom: 20px;
+  animation: feedbackIn 0.35s ease;
+}
+@keyframes feedbackIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.form-feedback--success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.form-feedback--error   { background: #fdecea; color: #b71c1c; border: 1px solid #ef9a9a; }
 
 /* ── FOOTER ── */
 .footer { background: var(--text); color: rgba(255,255,255,0.7); text-align: center; padding: 28px 24px; }
